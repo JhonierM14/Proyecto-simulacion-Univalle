@@ -1,8 +1,20 @@
 import numpy as np
 
-# para llenar la matriz con los valores iniciales, tenemos que asignar valores 
-# iniciales de acuerdo al comportamiento fisico o sentido fisico del fluido
-# al desplazarse en una region bidimensional
+# para llenar la matriz con los valores iniciales, podemos asignar valores 
+# iniciales de acuerdo al comportamiento fisico o sentido fisico del problema
+# o si desconocemos su comportamiento, asignar una distribucion lineal o 
+# completa
+
+# valores de frontera
+def ValsFrontMatrizVelX(MatrizVelocidadEjeX, velocidadInicial):
+    """
+    se llena la primera columna con los 
+    valores iniciales correspondientes
+    """
+    filas = MatrizVelocidadEjeX.shape[0]
+    for i in range(filas-1):
+        if(i!=0 and i != (filas - 1)):
+                MatrizVelocidadEjeX[i, 0] = velocidadInicial
 
 def decremento(numeroInicial, cantidadColumnas):
     """
@@ -24,11 +36,12 @@ def centroMatriz(filas):
         centro.append(int(filas/2) + 1)
     return centro
 
-def ValIniCentroMatrizVelX(filas, columnas, MatrizVelocidadEjeX, velocidadInicial, cantidadDecimales):
+def ValIniCentroMatrizVelX(MatrizVelocidadEjeX, velocidadInicial, cantidadDecimales):
     """
     funcion que llena los valores iniciales del 
-    centro de una matriz 
+    centro de una matriz
     """
+    filas, columnas = MatrizVelocidadEjeX.shape
     centro = centroMatriz(filas)
     for i in range(filas-1):
         for j in range(columnas-1):
@@ -41,11 +54,15 @@ def ValIniCentroMatrizVelX(filas, columnas, MatrizVelocidadEjeX, velocidadInicia
                 if(i!=0 and i != (filas-1) and j != 0 and i == centro[0] - 1):
                     MatrizVelocidadEjeX[i, j] = round(velocidadInicial - decremento(velocidadInicial, columnas)*j, cantidadDecimales)
 
-def ValIniMatrizVelY(filas, columnas, MatrizVelocidadEjeY, velocidadInicial, cantidadDecimales):
+def ValIniMatrizVelY(MatrizVelocidadEjeY, velocidadInicial):
+    """
+    asigna una vorticidad constante a la matriz y
+    """
+    filas, columnas = MatrizVelocidadEjeY.shape
     for j in range(columnas):
         for i in range(filas):
             if(i != 0 and i != (filas-1) and j != 0 and j != (columnas-1)):
-                MatrizVelocidadEjeY[i, j] = 0.1
+                MatrizVelocidadEjeY[i, j] = velocidadInicial
 
 def decrementoEjeY(MatrizVelocidadEjeX, filas):
     """
@@ -54,13 +71,13 @@ def decrementoEjeY(MatrizVelocidadEjeX, filas):
     decrementoValoresInicialesY = MatrizVelocidadEjeX[centroMatriz(filas)[0]-1, 1] /(int(filas/2))
     return decrementoValoresInicialesY
 
-def distParabolica(filas, columnas, MatrizVelocidadEjeX, presicion):
+def distParabolica(MatrizVelocidadEjeX, presicion):
     """
     establece los valores iniciales decrecientes en el eje y
     valores iniciales del eje con distribucion parabolica
     """
-
-    def ValIniNueMatrizVelYParabolico(filas, MatrizVelocidadEjeX, presicion):
+    filas, columnas = MatrizVelocidadEjeX.shape
+    def ValIniNueMatrizVelYParabolico():
         """
         # llena la primera columna de los valores iniciales con 
         # valores simetricos y decrecientes respecto al centro
@@ -73,7 +90,7 @@ def distParabolica(filas, columnas, MatrizVelocidadEjeX, presicion):
             if(i != (filas - 1) and i!= centro[0] - 1):
                 MatrizVelocidadEjeX[i, 1] = MatrizVelocidadEjeX[centro[0] - (i - int(filas/2 - 1)), 1]
 
-    def ValIniLMatrizVelX(filas, columnas, MatrizVelocidadEjeX, presicion):
+    def ValIniLMatrizVelX():
         """
         funcion que llena las casillas faltantes de la matriz con valores 
         iniciales correspondientes, ya definidos en la funcion anterior
@@ -86,8 +103,8 @@ def distParabolica(filas, columnas, MatrizVelocidadEjeX, presicion):
                 #PARTE SUPERIOR MATRIZ
                 if(i!=0 and i != (filas-1) and j != 0 and i < centro[0] - 1):
                     MatrizVelocidadEjeX[i, j+1] = round(velocidadInicial - decrementoX*(j + 1), presicion)
+                
                 # PARTE INFERIOR MATRIZ
-
                 # MATRIZ PAR
                 elif(len(centro) == 2):
                     if(i != (filas-1) and j != 0 and i > centro[1] - 1):
@@ -96,13 +113,14 @@ def distParabolica(filas, columnas, MatrizVelocidadEjeX, presicion):
                 else:
                     if(i != (filas-1) and j != 0 and i > centro[0] - 1):
                         MatrizVelocidadEjeX[i, j+1] = round(velocidadInicial - decrementoX*(j + 1), presicion)
-    ValIniNueMatrizVelYParabolico(filas, MatrizVelocidadEjeX, presicion)
-    ValIniLMatrizVelX(filas, columnas, MatrizVelocidadEjeX, presicion)
+    ValIniNueMatrizVelYParabolico()
+    ValIniLMatrizVelX()
 
-def distLineal(filas, columnas, MatrizVelocidadEjeX, velocidadInicial, presicion):
+def distLineal(MatrizVelocidadEjeX, velocidadInicial, presicion):
     """
     llena la matriz con los mismos valores iniciales en cada fila
     """
+    filas, columnas = MatrizVelocidadEjeX.shape
     for i in range(filas-1):
         for j in range(columnas-1):
             if(i!=0 and i!=(filas-1) and j!=0):
@@ -114,19 +132,6 @@ def distCompleta(matriz, valor):
     excepto las fronteras que quedan como 0.
     """
     matriz[1:-1, 1:-1] = valor       # Llena el interior con `valor`
-
-def matrizIdentidad(filas, columnas, coeficiente):
-    """
-    Retorna una matriz identidad
-    """
-    matriz = np.zeros((filas, columnas), float)
-    for i in range(filas):
-        for j in range(columnas):
-            if(i==j):
-                matriz[i,j] = coeficiente
-            else:
-                matriz[i,j] = 0
-    return matriz
 
 def copiarDiagonal(matriz):
     """
