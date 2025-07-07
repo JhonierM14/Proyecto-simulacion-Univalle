@@ -1,12 +1,12 @@
 import numpy as np
 
-# para llenar la matriz con los valores iniciales, podemos asignar valores 
+# Para llenar la matriz con los valores iniciales, podemos asignar valores 
 # iniciales de acuerdo al comportamiento fisico o sentido fisico del problema
 # o si desconocemos su comportamiento, asignar una distribucion lineal o 
 # completa
 
 # valores de frontera
-def ValsFrontMatrizVelX(MatrizVelocidadEjeX, velocidadInicial):
+def ValsFrontMatrizVel(MatrizVelocidadEjeX, velocidadInicial):
     """
     se llena la primera columna con los 
     valores iniciales correspondientes
@@ -36,7 +36,7 @@ def centroMatriz(filas):
         centro.append(int(filas/2) + 1)
     return centro
 
-def ValIniCentroMatrizVelX(MatrizVelocidadEjeX, velocidadInicial, cantidadDecimales):
+def ValIniCentroMatrizVelX(MatrizVelocidadEjeX, velocidadInicial, DECIMALES):
     """
     funcion que llena los valores iniciales del 
     centro de una matriz
@@ -48,11 +48,11 @@ def ValIniCentroMatrizVelX(MatrizVelocidadEjeX, velocidadInicial, cantidadDecima
             # si el centro es par
             if(len(centro) == 2):
                 if(i!=0 and i != (filas-1) and j != 0 and i == centro[0] - 1 or i == centro[1] - 1):
-                    MatrizVelocidadEjeX[i, j] = round(velocidadInicial - decremento(velocidadInicial, columnas)*j, cantidadDecimales)
+                    MatrizVelocidadEjeX[i, j] = round(velocidadInicial - decremento(velocidadInicial, columnas)*j, DECIMALES)
             # si el centro es una unica fila
             else:
                 if(i!=0 and i != (filas-1) and j != 0 and i == centro[0] - 1):
-                    MatrizVelocidadEjeX[i, j] = round(velocidadInicial - decremento(velocidadInicial, columnas)*j, cantidadDecimales)
+                    MatrizVelocidadEjeX[i, j] = round(velocidadInicial - decremento(velocidadInicial, columnas)*j, DECIMALES)
 
 def ValIniMatrizVelY(MatrizVelocidadEjeY, velocidadInicial):
     """
@@ -64,28 +64,29 @@ def ValIniMatrizVelY(MatrizVelocidadEjeY, velocidadInicial):
             if(i != 0 and i != (filas-1) and j != 0 and j != (columnas-1)):
                 MatrizVelocidadEjeY[i, j] = velocidadInicial
 
-def decrementoEjeY(MatrizVelocidadEjeX, filas):
+def decrementoEjeY(MatrizVelocidadEjeX, filas: int):
     """
     decremento para el eje y
     """
     decrementoValoresInicialesY = MatrizVelocidadEjeX[centroMatriz(filas)[0]-1, 1] /(int(filas/2))
     return decrementoValoresInicialesY
 
-def distParabolica(MatrizVelocidadEjeX, presicion):
+def distParabolica(MatrizVelocidadEjeX, DECIMALES: float):
     """
-    establece los valores iniciales decrecientes en el eje y
-    valores iniciales del eje con distribucion parabolica
+    Establece los valores iniciales decrecientes en el eje y, luego los
+    valores iniciales del resto de la matriz con distribucion parabolica
     """
     filas, columnas = MatrizVelocidadEjeX.shape
+
     def ValIniNueMatrizVelYParabolico():
         """
-        # llena la primera columna de los valores iniciales con 
-        # valores simetricos y decrecientes respecto al centro
+        Llena la primera columna de los valores iniciales con 
+        valores simetricos y decrecientes respecto al centro
         """
         centro = centroMatriz(filas)
         for i in range(int(filas/2)):
             if(i!=0 and i!= centro[0] - 1):
-                MatrizVelocidadEjeX[i, 1] = round(MatrizVelocidadEjeX[centro[0]-1, 1] - decrementoEjeY(MatrizVelocidadEjeX, filas)*(centro[0] - 1 - i), presicion)
+                MatrizVelocidadEjeX[i, 1] = round(MatrizVelocidadEjeX[centro[0]-1, 1] - decrementoEjeY(MatrizVelocidadEjeX, filas)*(centro[0] - 1 - i), DECIMALES)
         for i in range(int(filas/2), filas-1):
             if(i != (filas - 1) and i!= centro[0] - 1):
                 MatrizVelocidadEjeX[i, 1] = MatrizVelocidadEjeX[centro[0] - (i - int(filas/2 - 1)), 1]
@@ -93,7 +94,7 @@ def distParabolica(MatrizVelocidadEjeX, presicion):
     def ValIniLMatrizVelX():
         """
         funcion que llena las casillas faltantes de la matriz con valores 
-        iniciales correspondientes, ya definidos en la funcion anterior
+        iniciales correspondientes, ya definidos en la funcion ValIniNueMatrizVelYParabolico
         """
         centro = centroMatriz(filas)
         for i in range(filas-1):
@@ -102,21 +103,22 @@ def distParabolica(MatrizVelocidadEjeX, presicion):
                 decrementoX = decremento(velocidadInicial, columnas)
                 #PARTE SUPERIOR MATRIZ
                 if(i!=0 and i != (filas-1) and j != 0 and i < centro[0] - 1):
-                    MatrizVelocidadEjeX[i, j+1] = round(velocidadInicial - decrementoX*(j + 1), presicion)
+                    MatrizVelocidadEjeX[i, j+1] = round(velocidadInicial - decrementoX*(j + 1), DECIMALES)
                 
                 # PARTE INFERIOR MATRIZ
                 # MATRIZ PAR
                 elif(len(centro) == 2):
                     if(i != (filas-1) and j != 0 and i > centro[1] - 1):
-                        MatrizVelocidadEjeX[i, j+1] = round(velocidadInicial - decrementoX*(j + 1), presicion)
+                        MatrizVelocidadEjeX[i, j+1] = round(velocidadInicial - decrementoX*(j + 1), DECIMALES)
                 # UNICA FILA CENTRAL
                 else:
                     if(i != (filas-1) and j != 0 and i > centro[0] - 1):
-                        MatrizVelocidadEjeX[i, j+1] = round(velocidadInicial - decrementoX*(j + 1), presicion)
+                        MatrizVelocidadEjeX[i, j+1] = round(velocidadInicial - decrementoX*(j + 1), DECIMALES)
+
     ValIniNueMatrizVelYParabolico()
     ValIniLMatrizVelX()
 
-def distLineal(MatrizVelocidadEjeX, velocidadInicial, presicion):
+def distLineal(MatrizVelocidadEjeX, velocidadInicial, DECIMALES: float):
     """
     llena la matriz con los mismos valores iniciales en cada fila
     """
@@ -124,9 +126,9 @@ def distLineal(MatrizVelocidadEjeX, velocidadInicial, presicion):
     for i in range(filas-1):
         for j in range(columnas-1):
             if(i!=0 and i!=(filas-1) and j!=0):
-                MatrizVelocidadEjeX[i,j] = round(velocidadInicial - decremento(velocidadInicial, columnas)*j, presicion)
+                MatrizVelocidadEjeX[i,j] = round(velocidadInicial - decremento(velocidadInicial, columnas)*j, DECIMALES)
 
-def distCompleta(matriz, valor):
+def distCompleta(matriz, valor: float):
     """
     Crea una matriz de tamaño m x n llena con un valor designado, 
     excepto las fronteras que quedan como 0.
