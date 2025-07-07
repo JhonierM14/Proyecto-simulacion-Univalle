@@ -31,7 +31,7 @@ colores = [
     '#00ff00',  # Verde brillante
 ]
 
-def graficoValoresIniciales(matriz, name: str):
+def graficoValoresIniciales(matriz: np.ndarray, name: str) -> plt:
     # Definir los valores límites (de 1 a 0.01 en 20 pasos)
     valores = np.linspace(1.0, 0.01, 20)
 
@@ -47,7 +47,7 @@ def graficoValoresIniciales(matriz, name: str):
     plt.ylabel("Filas")
     plt.show()
 
-def grafico_convergencia_velocidades(MatrizVelocidadEjeX, name):
+def grafico_convergencia_velocidades(MatrizVelocidadEjeX: np.ndarray, name: str) -> plt:
     """
     Grafica una matriz de velocidades en escala de grises usando normalización logarítmica.
     Los valores deben estar entre 1e-8 y 1.

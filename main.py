@@ -1,4 +1,5 @@
 from Newton import *
+from spline import *
 
 vel_x, vel_y = inicializar_matrices()
 
@@ -13,4 +14,6 @@ graficoValoresIniciales(vel_y, "Valores iniciales vel_y (const 0.1)")
 "5 - Gradiente conjugado, "
 "6 - Gradiente descendente"
 
-metodo_newton(vel_x, vel_y, 4)
+metodo_newton(vel_x, vel_y, 3)
+
+aplicar_spline_2D(vel_x, vel_y, "Spline de matriz velocidad X final")

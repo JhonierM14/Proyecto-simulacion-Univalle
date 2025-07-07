@@ -55,7 +55,7 @@ def metodo_newton(vel_x, vel_y, metodo):
                 H = metodo_jacobi(J, F, x0, ITERACIONES_MAX, UMBRAL)
             case 4:
                 name = "Solución con el método de Gauss-Seidel"
-                H = gauss_seidel(J, F, x0, ITERACIONES_MAX)
+                H = gauss_seidel(J, F, x0, ITERACIONES_MAX, UMBRAL)
             case 5:
                 name = "Solución con el método del Gradiente conjugado"
                 H = gradiente_conjugado(J, F, x0, ITERACIONES_MAX, UMBRAL)

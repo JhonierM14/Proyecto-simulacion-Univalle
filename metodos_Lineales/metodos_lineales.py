@@ -1,6 +1,14 @@
 import numpy as np
 
-def Richardson(a: np.ndarray, b: np.ndarray, x0: np.ndarray, Q: np.ndarray, iteraciones: int, umbral: float) -> np.ndarray:
+def Richardson(a: np.ndarray, b: np.ndarray, x0: np.ndarray, Q: np.ndarray, M: int, umbral: float) -> np.ndarray:
+    """
+    a = matriz Jacobiana,
+    b = vector F,
+    x0: valores iniciales,
+    Q: matriz identidad, \n
+    M = iteraciones,
+    umbral = diferencia de los datos obtenidos entre dos M.
+    """
     n = b.shape[0]
 
     if x0 is None:
@@ -9,7 +17,7 @@ def Richardson(a: np.ndarray, b: np.ndarray, x0: np.ndarray, Q: np.ndarray, iter
         x = x0.reshape((n,1))
         
     b = b.reshape(n,1)
-    for k in range (iteraciones):
+    for k in range (M):
         n = b.shape[0]
         r = np.zeros((n,1))
         for i in range(n):
@@ -23,10 +31,17 @@ def Richardson(a: np.ndarray, b: np.ndarray, x0: np.ndarray, Q: np.ndarray, iter
             # print(f"Convergencia alcanzada en iteración {k} con umbral {umbral}")
             return x
 
-    # print("No se alcanzó la convergencia dentro del número máximo de iteraciones.")
+    # print("No se alcanzó la convergencia dentro del número máximo de M.")
     return x
 
-def metodo_jacobi(a, b, x0, M: int, umbral: float):
+def metodo_jacobi(a: np.ndarray, b: np.ndarray, x0: np.ndarray, M: int, umbral: float)-> np.ndarray:
+    """
+    a = matriz Jacobiana,
+    b = vector F,
+    x0: valores iniciales, \n
+    M = iteraciones,
+    umbral = diferencia de los datos obtenidos entre dos M.
+    """
     n = len(b)
     
     if x0 is None:
@@ -43,7 +58,8 @@ def metodo_jacobi(a, b, x0, M: int, umbral: float):
                 if j != i:
                     suma += a[i][j] * x[j]
             u[i] = (b[i] - suma) / a[i][i]
-    # Verificar convergencia usando norma infinito
+        
+        # Verificar convergencia usando norma infinito
         diff = np.abs(u - x)
         norma_inf = np.max(diff)
         if norma_inf < umbral:
@@ -51,18 +67,18 @@ def metodo_jacobi(a, b, x0, M: int, umbral: float):
             return u
         
         x[:] = u  # actualizar x para la siguiente iteración
-        print(f"Iteración {k+1}")
 
-    print("No se alcanzó la convergencia en el número de iteraciones dado.")
+    print("No se alcanzó la convergencia en el número de M dado, Jacobi")
     
     return x
 
-def gauss_seidel(a, b, x0, M):
+def gauss_seidel(a: np.ndarray, b: np.ndarray, x0: np.ndarray, M: int, umbral: float) -> np.ndarray:
     """
-    a = J,
-    b = F,
+    a = matriz Jacobiana,
+    b = vector F,
     x0: valores iniciales,
-    M = iteraciones.
+    M = iteraciones,
+    umbral = diferencia de los datos obtenidos entre dos M.
     """
     n = len(b)
 
@@ -74,7 +90,7 @@ def gauss_seidel(a, b, x0, M):
     u = x
 
     for k in range(M):
-        print(f"iteracion {k+1}")
+        x_anterior = np.copy(x)
         for i in range(n):
             suma = 0
             for j in range(n):
@@ -82,9 +98,19 @@ def gauss_seidel(a, b, x0, M):
                     suma += a[i][j] * u[j]
             u[i] = (b[i] - suma) / a[i][i]
         x = u
+
+        # Verificar convergencia usando norma infinito
+        diff = np.abs(x - x_anterior)
+        norma_inf = np.max(diff)
+        if norma_inf < umbral:
+            print(f"Convergencia alcanzada Gauss-Seidel en la iteración {k+1} con norma infinito {norma_inf:.2e}")
+            return x
+    
+    print("No se alcanzó la convergencia en el número de M dado, Gauss-Seidel")
+    
     return x
 
-def gradiente_descendente(A, b, x0, iteraciones: int, umbral: float):
+def gradiente_descendente(A: np.ndarray, b: np.ndarray, x0: np.ndarray, M: int, umbral: float) -> np.ndarray:
     """
     Resuelve Ax = b usando el método del gradiente descendente.
 
@@ -92,7 +118,7 @@ def gradiente_descendente(A, b, x0, iteraciones: int, umbral: float):
         A: Matriz cuadrada del sistema,
         b: Vector columna (n x 1),
         x0: valores iniciales,
-        iteraciones: Número máximo de iteraciones,
+        M: Número máximo de iteraciones,
         umbral: umbral de convergencia.
 
     Returns:
@@ -108,7 +134,7 @@ def gradiente_descendente(A, b, x0, iteraciones: int, umbral: float):
 
     b = b.reshape((n, 1))  # Asegura que b es columna
 
-    for k in range(iteraciones):
+    for k in range(M):
         r = b - A @ x
         gradiente = -r
         numerador = np.dot(r.T, r)
@@ -128,7 +154,14 @@ def gradiente_descendente(A, b, x0, iteraciones: int, umbral: float):
     print("No se alcanzó convergencia con gradiente descendente.")
     return x
 
-def gradiente_conjugado(A, b, x0, iteraciones: int, umbral: float):
+def gradiente_conjugado(A: np.ndarray, b: np.ndarray, x0: np.ndarray, M: int, umbral: float)-> np.ndarray:
+    """
+    A = matriz Jacobiana,
+    b = vector F,
+    x0: valores iniciales, \n
+    M = iteraciones,
+    umbral = diferencia de los datos obtenidos entre dos iteraciones.
+    """
     n = len(b)
     if x0 is None:
         x = np.zeros(n)
@@ -139,7 +172,7 @@ def gradiente_conjugado(A, b, x0, iteraciones: int, umbral: float):
     p = r.copy()
     rs_old = np.dot(r, r)
 
-    for i in range(iteraciones):
+    for i in range(M):
         Ap = A @ p
         alpha = rs_old / np.dot(p, Ap)
         x = x + alpha * p
@@ -147,9 +180,8 @@ def gradiente_conjugado(A, b, x0, iteraciones: int, umbral: float):
         rs_new = np.dot(r, r)
 
         if np.linalg.norm(r, ord=1) < umbral:
-            print(f"Convergió en {i+1} iteraciones.")
+            print(f"Convergió en {i+1} M.")
             break
-
 
         beta = rs_new / rs_old
         p = r + beta * p
