@@ -155,5 +155,4 @@ def gradiente_conjugado(A, b, x0, iteraciones: int, umbral: float):
         p = r + beta * p
         rs_old = rs_new
 
-    print(x)
     return x
